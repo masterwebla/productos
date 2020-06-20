@@ -64,16 +64,55 @@ class ProductosController extends Controller
 
     public function edit($id)
     {
-        //
+        $producto = Producto::find($id);
+        $categorias = Categoria::all();
+        return view('productos.editar',compact('producto','categorias'));
     }
 
     public function update(Request $request, $id)
     {
-        //
+        //Validar los campos
+        $request->validate([
+            'nombre' => 'required|max:100',
+            'precio' => 'required|numeric',
+            'descripcion' => 'required',
+            'imagen' => 'mimes:jpeg,bmp,png',
+            'categoria_id' => 'required'
+        ]);
+
+        //Subir la imagen nueva
+        $nombreimg = "";
+        if($request->file('imagen')){
+            $imagen = $request->file('imagen');
+            $ruta = public_path().'/imgproductos';
+            $nombreimg = uniqid()."-".$imagen->getClientOriginalName();
+            $imagen->move($ruta,$nombreimg);
+        }
+
+        //Actualizar los datos en la BD
+        $producto = Producto::find($id);
+        $producto->nombre = $request->nombre;
+        $producto->precio = $request->precio;
+        $producto->descripcion = $request->descripcion;
+        if($request->file('imagen')){
+            //Borrar la imagen actual
+            $rutaimgactual = public_path().'/imgproductos/'.$producto->imagen;
+            unlink($rutaimgactual);
+            //Ingresar el nuevo nombre
+            $producto->imagen = $nombreimg;
+        }
+        $producto->categoria_id = $request->categoria_id;
+        $producto->save();
+
+        return redirect()->route('productos.index');
+
     }
 
     public function destroy($id)
     {
-        //
+        $producto = Producto::find($id);
+        $producto->delete();
+
+        return redirect()->route('productos.index');
     }
 }

@@ -12,6 +12,7 @@
 					<th>Precio</th>
 					<th>Categoria</th>
 					<th>Descripcion</th>
+					<th>Imagen</th>
 					<th>Opciones</th>
 				</tr>
 			</thead>
@@ -20,8 +21,11 @@
 					<tr>
 						<td>{{$producto->nombre}}</td>
 						<td>${{$producto->precio}}</td>
-						<td>{{$producto->categoria_id}}</td>
+						<td>{{$producto->categoria->nombre}}</td>
 						<td>{{$producto->descripcion}}</td>
+						<td>
+							<img src="{{asset('imgproductos/'.$producto->imagen.'')}}" height="60">
+						</td>
 						<td>							
 							<form action="{{ route('productos.destroy',$producto->id) }}" method="POST">
 								@csrf
